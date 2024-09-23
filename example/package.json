@@ -11,11 +11,11 @@
   "dependencies": {
     "@mattermost/react-native-paste-input": "file://../",
     "react": "18.2.0",
-    "react-native": "0.74.0"
+    "react-native": "0.75.3"
   },
   "devDependencies": {
     "@babel/runtime": "7.24.4",
-    "@react-native/babel-preset": "0.74.81",
+    "@react-native/babel-preset": "0.75.3",
     "babel-plugin-module-resolver": "5.0.2"
   },
   "engines": {
