@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Platform, StyleSheet, View, Button } from 'react-native';
+import { Platform, StyleSheet, View, Button, Text } from 'react-native';
 import PasteInput, {
     type PastedFile,
     type PasteInputRef,
@@ -50,7 +50,10 @@ export default function App() {
                     autoComplete="off"
                     smartPunctuation="disable"
                     selectionColor={'yellow'}
-                />
+                    defaultValue="hello world"
+                >
+                  <Text>Hello World</Text>
+                </PasteInput>
             )}
             <Button
                 title={inputVisible ? 'Hide Input' : 'Show Input'}
