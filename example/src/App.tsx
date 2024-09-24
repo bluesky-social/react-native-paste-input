@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View, Button, Text } from 'react-native';
 import PasteInput, {
     type PastedFile,
     type PasteInputRef,
-} from '@mattermost/react-native-paste-input';
+} from '@haileyok/react-native-paste-input';
 
 import Details from './Details';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@mattermost/react-native-paste-input-example",
+  "name": "@haileyok/react-native-paste-input-example",
   "description": "Example app for @mattermost/react-native-paste-input",
   "version": "0.0.1",
   "private": true,
@@ -9,7 +9,7 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "@mattermost/react-native-paste-input": "file://../",
+    "@haileyok/react-native-paste-input": "file://../",
     "react": "18.2.0",
     "react-native": "0.75.3"
   },

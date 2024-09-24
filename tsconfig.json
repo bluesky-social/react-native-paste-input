@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@mattermost/react-native-paste-input": ["./src/index"]
+      "@haileyok/react-native-paste-input": ["./src/index"]
     },
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
