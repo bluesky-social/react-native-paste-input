@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Platform, StyleSheet, View, Button } from 'react-native';
+import { Platform, StyleSheet, View, Button, Text } from 'react-native';
 import PasteInput, {
     type PastedFile,
     type PasteInputRef,
-} from '@mattermost/react-native-paste-input';
+} from '@haileyok/react-native-paste-input';
 
 import Details from './Details';
 
@@ -49,8 +49,10 @@ export default function App() {
                     textContentType="none"
                     autoComplete="off"
                     smartPunctuation="disable"
-                    selectionColor={'yellow'}
-                />
+                    selectionColor={'blue'}
+                >
+                  <Text style={{color: 'red', fontSize: 30}}>Hello world hello world hello world hello world</Text>
+                </PasteInput>
             )}
             <Button
                 title={inputVisible ? 'Hide Input' : 'Show Input'}

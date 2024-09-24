@@ -1,6 +1,6 @@
 {
-  "name": "@mattermost/react-native-paste-input",
-  "version": "0.8.0",
+  "name": "@haileyok/react-native-paste-input",
+  "version": "0.8.1-rc.2",
   "description": "React Native TextInput replacement to allow pasting files",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -14,6 +14,7 @@
     "ios",
     "cpp",
     "react-native-paste-input.podspec",
+    "react-native.config.js",
     "!lib/typescript/example",
     "!**/__tests__",
     "!**/__fixtures__",
@@ -23,8 +24,9 @@
     "!**/.idea",
     "!**/.gradle",
     "!android/build",
+    "!android/.cxx",
     "!ios/Build",
-    ".circleci"
+    "!.circleci"
   ],
   "scripts": {
     "test": "jest",
@@ -156,9 +158,9 @@
     "name": "PasteTextInputSpecs",
     "type": "components",
     "jsSrcsDir": "./src",
-    "includesGeneratedCode": false,
     "outputDir": {
-      "ios": "./ios"
+      "ios": "./ios",
+      "android": "./android/src/main"
     },
     "android": {
       "javaPackageName": "com.mattermost.pastetextinput"
