@@ -8,36 +8,37 @@
  */
 #pragma once
 
-#include <folly/dynamic.h>
-#include <react/renderer/attributedstring/AttributedString.h>
-#include <react/renderer/attributedstring/ParagraphAttributes.h>
+#include <react/renderer/components/androidtextinput/AndroidTextInputState.h>
 
 namespace facebook::react {
 
-class PasteTextInputState {
-public:
-    int64_t mostRecentEventCount = 0;
-    int64_t cachedAttributedStringId{0};
-    AttributedString attributedString{};
-    AttributedString reactTreeAttributedString{};
-    ParagraphAttributes paragraphAttributes{};
+typedef AndroidTextInputState PasteTextInputState;
 
-    PasteTextInputState(
-        int64_t mostRecentEventCount,
-        int64_t cachedAttributedStringId,
-        AttributedString attributedString,
-        AttributedString reactTreeAttributedString,
-        ParagraphAttributes paragraphAttributes
-    );
-
-    PasteTextInputState() = default;
-
-    PasteTextInputState(
-            const PasteTextInputState& previousState,
-            const folly::dynamic& data);
-
-    folly::dynamic getDynamic() const;
-    MapBuffer getMapBuffer() const;
-};
+//class PasteTextInputState {
+//
+//public:
+//    int64_t mostRecentEventCount = 0;
+//    int64_t cachedAttributedStringId{0};
+//    AttributedString attributedString{};
+//    AttributedString reactTreeAttributedString{};
+//    ParagraphAttributes paragraphAttributes{};
+//
+//    PasteTextInputState(
+//        int64_t mostRecentEventCount,
+//        int64_t cachedAttributedStringId,
+//        AttributedString attributedString,
+//        AttributedString reactTreeAttributedString,
+//        ParagraphAttributes paragraphAttributes
+//    );
+//
+//    PasteTextInputState() = default;
+//
+//    PasteTextInputState(
+//            const PasteTextInputState& previousState,
+//            const folly::dynamic& data);
+//
+//    folly::dynamic getDynamic() const;
+//    MapBuffer getMapBuffer() const;
+//};
 
 } // namespace facebook::react
