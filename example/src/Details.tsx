@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import type { PastedFile } from '@haileyok/react-native-paste-input';
+import type { PastedFile } from '@mattermost/react-native-paste-input';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface DetailsProps {
