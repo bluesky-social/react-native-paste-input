@@ -14,31 +14,4 @@ namespace facebook::react {
 
 typedef AndroidTextInputState PasteTextInputState;
 
-//class PasteTextInputState {
-//
-//public:
-//    int64_t mostRecentEventCount = 0;
-//    int64_t cachedAttributedStringId{0};
-//    AttributedString attributedString{};
-//    AttributedString reactTreeAttributedString{};
-//    ParagraphAttributes paragraphAttributes{};
-//
-//    PasteTextInputState(
-//        int64_t mostRecentEventCount,
-//        int64_t cachedAttributedStringId,
-//        AttributedString attributedString,
-//        AttributedString reactTreeAttributedString,
-//        ParagraphAttributes paragraphAttributes
-//    );
-//
-//    PasteTextInputState() = default;
-//
-//    PasteTextInputState(
-//            const PasteTextInputState& previousState,
-//            const folly::dynamic& data);
-//
-//    folly::dynamic getDynamic() const;
-//    MapBuffer getMapBuffer() const;
-//};
-
 } // namespace facebook::react
