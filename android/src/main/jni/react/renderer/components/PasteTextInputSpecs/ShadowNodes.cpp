@@ -14,33 +14,104 @@
 #include <react/renderer/core/LayoutContext.h>
 #include <react/renderer/core/conversions.h>
 
+#include <react/featureflags/ReactNativeFeatureFlags.h>
+#include <react/jni/ReadableNativeMap.h>
+#include <react/renderer/attributedstring/AttributedStringBox.h>
+#include <react/renderer/attributedstring/TextAttributes.h>
+#include <react/renderer/components/text/BaseTextShadowNode.h>
+#include <react/renderer/core/LayoutConstraints.h>
+#include <react/renderer/core/LayoutContext.h>
+#include <react/renderer/core/conversions.h>
+#include <react/renderer/textlayoutmanager/TextLayoutContext.h>
+
 namespace facebook::react {
 
 extern const char PasteTextInputComponentName[] = "PasteTextInput";
 
-typedef AndroidTextInputShadowNode PasteTextInputShadowNode;
+PasteTextInputShadowNode::PasteTextInputShadowNode(
+        const ShadowNode& sourceShadowNode,
+        const ShadowNodeFragment& fragment)
+        : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+    auto& sourcePasteTextInputShadowNode =
+        static_cast<const PasteTextInputShadowNode&>(sourceShadowNode);
 
-//PasteTextInputShadowNode::PasteTextInputShadowNode(
-//        const ShadowNode& sourceShadowNode,
-//        const ShadowNodeFragment& fragment)
-//        : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-//    auto& sourcePasteTextInputShadowNode =
-//        static_cast<const PasteTextInputShadowNode&>(sourceShadowNode);
-//
-//    if (ReactNativeFeatureFlags::enableCleanTextInputYogaNode()) {
-//        if (!fragment.children && !fragment.props &&
-//            sourcePasteTextInputShadowNode.getIsLayoutClean()) {
-//            // This ParagraphShadowNode was cloned but did not change
-//            // in a way that affects its layout. Let's mark it clean
-//            // to stop Yoga from traversing it.
-//            cleanLayout();
-//        }
+    if (ReactNativeFeatureFlags::enableCleanTextInputYogaNode()) {
+        if (!fragment.children && !fragment.props &&
+            sourcePasteTextInputShadowNode.getIsLayoutClean()) {
+            // This ParagraphShadowNode was cloned but did not change
+            // in a way that affects its layout. Let's mark it clean
+            // to stop Yoga from traversing it.
+            cleanLayout();
+        }
+    }
+}
+
+void PasteTextInputShadowNode::setContextContainer(
+        facebook::react::ContextContainer *contextContainer) {
+    ensureUnsealed();
+    contextContainer_ = contextContainer;
+}
+
+
+AttributedString PasteTextInputShadowNode::getAttributedString() const {
+    // Use BaseTextShadowNode to get attributed string from children
+    auto childTextAttributes = TextAttributes::defaultTextAttributes();
+
+    auto attributedString = AttributedString{};
+    auto attachments = BaseTextShadowNode::Attachments{};
+    BaseTextShadowNode::buildAttributedString(
+            childTextAttributes, *this, attributedString, attachments);
+
+    // BaseTextShadowNode only gets children. We must detect and prepend text
+    // value attributes manually.
+    if (!getConcreteProps().text.empty()) {
+        auto textAttributes = TextAttributes::defaultTextAttributes();
+        auto fragment = AttributedString::Fragment{};
+        fragment.string = getConcreteProps().text;
+        fragment.textAttributes = textAttributes;
+        // If the TextInput opacity is 0 < n < 1, the opacity of the TextInput and
+        // text value's background will stack. This is a hack/workaround to prevent
+        // that effect.
+        fragment.textAttributes.backgroundColor = clearColor();
+        fragment.parentShadowView = ShadowView(*this);
+        attributedString.prependFragment(fragment);
+    }
+
+    return attributedString;
+}
+
+void PasteTextInputShadowNode::updateStateIfNeeded() {
+    ensureUnsealed();
+
+    auto reactTreeAttributedString = getAttributedString();
+    const auto& state = getStateData();
+
+//    if (state.reactTreeAttributedString == reactTreeAttributedString) {
+//        return;
 //    }
-//}
 //
-//void PasteTextInputShadowNode::setContextContainer(
-//        facebook::react::ContextContainer *contextContainer) {
-//    ensureUnsealed();
-//    contextContainer_ = contextContainer;
-//}
+//    if (getConcreteProps().mostRecentEventCount < state.mostRecentEventCount) {
+//        return;
+//    }
+//
+//    const auto newEventCount = state.reactTreeAttributedString.isContentEqual(reactTreeAttributedString)
+//            ? 0
+//            : getConcreteProps().mostRecentEventCount;
+//
+//    auto newAttributedString = getAttributedString();
+
+    setStateData(PasteTextInputState{
+        0,
+        0,
+        reactTreeAttributedString,
+        reactTreeAttributedString,
+        state.paragraphAttributes
+    });
+}
+
+void PasteTextInputShadowNode::layout(facebook::react::LayoutContext layoutContext) {
+    updateStateIfNeeded();
+    ConcreteViewShadowNode::layout(layoutContext);
+}
+
 } // namespace facebook::react

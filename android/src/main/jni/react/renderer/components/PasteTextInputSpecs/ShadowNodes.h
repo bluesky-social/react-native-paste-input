@@ -22,35 +22,40 @@ namespace facebook::react {
 
 JSI_EXPORT extern const char PasteTextInputComponentName[];
 
-typedef AndroidTextInputShadowNode PasteTextInputShadowNode;
-
 /*
  * `ShadowNode` for <PasteTextInput> component.
  */
-//class PasteTextInputShadowNode final : public ConcreteViewShadowNode<
-//    PasteTextInputComponentName,
-//    PasteTextInputProps,
-//    PasteTextInputEventEmitter,
-//    PasteTextInputState,
-//    true
-//    > {
-//public:
-//    static ShadowNodeTraits BaseTraits() {
-//        auto traits = ConcreteViewShadowNode::BaseTraits();
-//        traits.set(ShadowNodeTraits::Trait::LeafYogaNode);
-//        return traits;
-//    }
-//
-//    using ConcreteViewShadowNode::ConcreteViewShadowNode;
-//
-//    PasteTextInputShadowNode(
-//        ShadowNodeFragment const &fragment,
-//        ComponentDescriptor const &componentDescriptor
-//    );
-//
-//    void setContextContainer(
-//        ContextContainer *contextContainer
-//    );
-//};
+class PasteTextInputShadowNode final : public ConcreteViewShadowNode<
+    PasteTextInputComponentName,
+    PasteTextInputProps,
+    PasteTextInputEventEmitter,
+    PasteTextInputState> {
+public:
+    static ShadowNodeTraits BaseTraits() {
+        auto traits = ConcreteViewShadowNode::BaseTraits();
+        traits.set(ShadowNodeTraits::Trait::LeafYogaNode);
+        return traits;
+    }
+
+    using ConcreteViewShadowNode::ConcreteViewShadowNode;
+
+    PasteTextInputShadowNode(
+        const ShadowNode& sourceShadowNode,
+        const ShadowNodeFragment& fragment);
+
+    void setContextContainer(
+        ContextContainer *contextContainer
+    );
+
+    AttributedString getAttributedString() const;
+    AttributedString getPlaceholderAttributedString() const;
+
+private:
+    ContextContainer *contextContainer_;
+
+    void updateStateIfNeeded();
+
+    void layout(LayoutContext layoutContext) override;
+};
 
 } // namespace facebook::react

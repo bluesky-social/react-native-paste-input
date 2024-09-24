@@ -8,22 +8,36 @@
  */
 #pragma once
 
-#ifdef ANDROID
 #include <folly/dynamic.h>
-#endif
+#include <react/renderer/attributedstring/AttributedString.h>
+#include <react/renderer/attributedstring/ParagraphAttributes.h>
 
 namespace facebook::react {
 
 class PasteTextInputState {
 public:
-  PasteTextInputState() = default;
+    int64_t mostRecentEventCount = 0;
+    int64_t cachedAttributedStringId{0};
+    AttributedString attributedString{};
+    AttributedString reactTreeAttributedString{};
+    ParagraphAttributes paragraphAttributes{};
 
-#ifdef ANDROID
-  PasteTextInputState(PasteTextInputState const &previousState, folly::dynamic data){};
-  folly::dynamic getDynamic() const {
-    return {};
-  };
-#endif
+    PasteTextInputState(
+        int64_t mostRecentEventCount,
+        int64_t cachedAttributedStringId,
+        AttributedString attributedString,
+        AttributedString reactTreeAttributedString,
+        ParagraphAttributes paragraphAttributes
+    );
+
+    PasteTextInputState() = default;
+
+    PasteTextInputState(
+            const PasteTextInputState& previousState,
+            const folly::dynamic& data);
+
+    folly::dynamic getDynamic() const;
+    MapBuffer getMapBuffer() const;
 };
 
 } // namespace facebook::react
