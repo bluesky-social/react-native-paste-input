@@ -37,10 +37,6 @@ android {
               cppFlags ''
           }
       }
-    ndk {
-        moduleName "pasteinputtext"
-        ldLibs "log"
-    }
   }
 
   sourceSets {
