@@ -14,6 +14,7 @@
     "ios",
     "cpp",
     "react-native-paste-input.podspec",
+    "react-native.config.js",
     "!lib/typescript/example",
     "!**/__tests__",
     "!**/__fixtures__",
