@@ -23,8 +23,9 @@
     "!**/.idea",
     "!**/.gradle",
     "!android/build",
+    "!android/.cxx",
     "!ios/Build",
-    ".circleci"
+    "!.circleci"
   ],
   "scripts": {
     "test": "jest",
