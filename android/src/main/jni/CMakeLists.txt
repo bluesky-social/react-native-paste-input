@@ -39,7 +39,6 @@ target_link_libraries(
   rrc_view
   rrc_text
   rrc_textinput
-  rrc_image
   yoga
   ${log-lib}
 )
