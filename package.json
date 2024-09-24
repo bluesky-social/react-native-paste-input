@@ -156,9 +156,9 @@
     "name": "PasteTextInputSpecs",
     "type": "components",
     "jsSrcsDir": "./src",
-    "includesGeneratedCode": false,
     "outputDir": {
-      "ios": "./ios"
+      "ios": "./ios",
+      "android": "./android/src/main"
     },
     "android": {
       "javaPackageName": "com.mattermost.pastetextinput"

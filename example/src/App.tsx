@@ -49,8 +49,7 @@ export default function App() {
                     textContentType="none"
                     autoComplete="off"
                     smartPunctuation="disable"
-                    selectionColor={'yellow'}
-                    defaultValue="hello world"
+                    selectionColor={'blue'}
                 >
                   <Text>Hello World</Text>
                 </PasteInput>

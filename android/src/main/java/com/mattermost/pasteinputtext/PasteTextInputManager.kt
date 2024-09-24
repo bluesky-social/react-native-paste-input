@@ -1,10 +1,14 @@
 package com.mattermost.pasteinputtext
 
 import android.text.InputType
+import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.common.MapBuilder
+import com.facebook.react.common.mapbuffer.MapBuffer
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.ReactStylesDiffMap
+import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.annotations.ReactProp
@@ -19,6 +23,10 @@ class PasteTextInputManager(context: ReactApplicationContext) : ReactTextInputMa
 
   override fun getName(): String = NAME
 
+  init {
+    Log.d("PasteTextInputManager", "getReactTextUpdate")
+  }
+
   @ReactProp(name = "disableCopyPaste", defaultBoolean = false)
   fun setDisableCopyPaste(editText: PasteInputEditText, disabled: Boolean) {
     disableCopyPaste = disabled
@@ -30,6 +38,15 @@ class PasteTextInputManager(context: ReactApplicationContext) : ReactTextInputMa
 
   private fun getEventDispatcher(reactContext: ReactContext, editText: ReactEditText): EventDispatcher? {
     return UIManagerHelper.getEventDispatcherForReactTag(reactContext, editText.id)
+  }
+
+  override fun updateState(
+    view: ReactEditText,
+    props: ReactStylesDiffMap?,
+    stateWrapper: StateWrapper?
+  ): Any? {
+    Log.d("PasteTextInputManager", "updateState")
+    return super.updateState(view, props, stateWrapper)
   }
 
   override fun createViewInstance(context: ThemedReactContext): PasteInputEditText {

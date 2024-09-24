@@ -27,20 +27,31 @@ apply plugin: 'org.jetbrains.kotlin.android'
 android {
   compileSdkVersion safeExtGet('compileSdkVersion', 33)
   namespace "com.mattermost.pasteinputtext"
-  
+
   defaultConfig {
     minSdkVersion safeExtGet('minSdkVersion', 24)
     targetSdkVersion safeExtGet('targetSdkVersion', 33)
     buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", "true")
+      externalNativeBuild {
+          cmake {
+              cppFlags ''
+          }
+      }
   }
 
   sourceSets {
     main {
       if (isNewArchitectureEnabled()) {
-        // java.srcDirs += ['src/newarch']
+//         java.srcDirs += ['src/newarch']
       }
     }
-  }    
+  }
+    externalNativeBuild {
+        cmake {
+            path file('../../../../../android/src/main/jni/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
 }
 
 repositories {
