@@ -24,13 +24,6 @@
 #include <react/renderer/core/conversions.h>
 #include <react/renderer/textlayoutmanager/TextLayoutContext.h>
 
-#include <android/log.h>
-
-#define LOG_TAG "PasteTextInputShadowNode"
-#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-
 namespace facebook::react {
 
 extern const char PasteTextInputComponentName[] = "PasteTextInput";
@@ -60,26 +53,18 @@ void PasteTextInputShadowNode::setContextContainer(
 }
 
 AttributedString PasteTextInputShadowNode::getAttributedString() const {
-    // Use BaseTextShadowNode to get attributed string from children
     auto childTextAttributes = TextAttributes::defaultTextAttributes();
-//    childTextAttributes.apply(getConcreteProps().textAttributes);
 
     auto attributedString = AttributedString{};
     auto attachments = BaseTextShadowNode::Attachments{};
     BaseTextShadowNode::buildAttributedString(
             childTextAttributes, *this, attributedString, attachments);
 
-    // BaseTextShadowNode only gets children. We must detect and prepend text
-    // value attributes manually.
     if (!getConcreteProps().text.empty()) {
         auto textAttributes = TextAttributes::defaultTextAttributes();
-//        textAttributes.apply(getConcreteProps().textAttributes);
         auto fragment = AttributedString::Fragment{};
         fragment.string = getConcreteProps().text;
         fragment.textAttributes = textAttributes;
-        // If the TextInput opacity is 0 < n < 1, the opacity of the TextInput and
-        // text value's background will stack. This is a hack/workaround to prevent
-        // that effect.
         fragment.textAttributes.backgroundColor = clearColor();
         fragment.parentShadowView = ShadowView(*this);
         attributedString.prependFragment(fragment);
@@ -92,8 +77,6 @@ AttributedString PasteTextInputShadowNode::getPlaceholderAttributedString() cons
     auto textAttributedString = AttributedString{};
     auto fragment = AttributedString::Fragment{};
     fragment.string = getConcreteProps().placeholder;
-
-    LOGI("Trying to get placeholder");
 
     if (fragment.string.empty()) {
         fragment.string = BaseTextShadowNode::getEmptyPlaceholder();
@@ -139,17 +122,13 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
     // This is by design - don't change the value of the TextInput in the State,
     // and therefore in Java, unless the tree itself changes.
     if (state.reactTreeAttributedString == reactTreeAttributedString) {
-        LOGI("same");
         return;
     }
 
     // If props event counter is less than what we already have in state, skip it
     if (getConcreteProps().mostRecentEventCount < state.mostRecentEventCount) {
-        LOGI("skip");
         return;
     }
-
-    LOGI("grabbing");
 
     // Even if we're here and updating state, it may be only to update the layout
     // manager If that is the case, make sure we don't update text: pass in the
@@ -161,9 +140,6 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
             ? 0
             : getConcreteProps().mostRecentEventCount;
     auto newAttributedString = getMostRecentAttributedString();
-
-    LOGI("event count: %d", newEventCount);
-    LOGI("string: %s", newAttributedString.getString().c_str());
 
     setStateData(AndroidTextInputState{
             newEventCount,
@@ -195,13 +171,6 @@ Size AndroidTextInputShadowNode::measureContent(
     // use the same value here that we *will* use in layout to update the state.
     AttributedString attributedString = getMostRecentAttributedString();
 
-    if (attributedString.isEmpty()) {
-        LOGI("empty");
-        attributedString = getPlaceholderAttributedString();
-    } else {
-        LOGI("Was not empty");
-    }
-
     if (attributedString.isEmpty() && getStateData().mostRecentEventCount != 0) {
         return {0, 0};
     }
@@ -218,7 +187,6 @@ Size AndroidTextInputShadowNode::measureContent(
 }
 
 void PasteTextInputShadowNode::layout(facebook::react::LayoutContext layoutContext) {
-    LOGI("layout");
     updateStateIfNeeded();
     ConcreteViewShadowNode::layout(layoutContext);
 }
@@ -227,6 +195,5 @@ void PasteTextInputShadowNode::setTextLayoutManager(SharedTextLayoutManager text
     ensureUnsealed();
     textLayoutManager_ = textLayoutManager;
 }
-
 
 } // namespace facebook::react

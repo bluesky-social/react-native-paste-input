@@ -1,20 +1,14 @@
 package com.mattermost.pasteinputtext
 
-import android.os.Build
 import android.text.InputType
-import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.common.MapBuilder
-import com.facebook.react.common.mapbuffer.MapBuffer
 import com.facebook.react.module.annotations.ReactModule
-import com.facebook.react.uimanager.ReactStylesDiffMap
-import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.react.uimanager.events.EventDispatcher
-import com.facebook.react.views.text.TextLayoutManager
 import com.facebook.react.views.textinput.ReactEditText
 import com.facebook.react.views.textinput.ReactTextInputManager
 
@@ -36,21 +30,6 @@ class PasteTextInputManager(context: ReactApplicationContext) : ReactTextInputMa
 
   private fun getEventDispatcher(reactContext: ReactContext, editText: ReactEditText): EventDispatcher? {
     return UIManagerHelper.getEventDispatcherForReactTag(reactContext, editText.id)
-  }
-
-  override fun updateState(
-    view: ReactEditText,
-    props: ReactStylesDiffMap?,
-    stateWrapper: StateWrapper?
-  ): Any? {
-//    stateWrapper?.stateData?.getInt("mostRecentEventCount")?.let {
-//      Log.d("PasteTextInputManager", "mostRecentEventCount: $it")
-//    }
-    val buffer = stateWrapper?.stateDataMapBuffer
-    buffer?.count.let {
-      Log.d("PasteTextInputManager", "buffer count: $it")
-    }
-    return super.updateState(view, props, stateWrapper)
   }
 
   override fun createViewInstance(context: ThemedReactContext): PasteInputEditText {
@@ -82,28 +61,6 @@ class PasteTextInputManager(context: ReactApplicationContext) : ReactTextInputMa
     )
 
     return map
-  }
-
-  override fun getReactTextUpdate(
-    view: ReactEditText?,
-    props: ReactStylesDiffMap?,
-    state: MapBuffer?
-  ): Any? {
-    if (state!!.count == 0) {
-      Log.d("PasteTextInputManager", "getReactTextUpdate: state count is 0")
-      return null
-    } else {
-      Log.d("PasteTextInputManager", "it was there!")
-      val attributedString = state!!.getMapBuffer(0)
-      val paragraphAttributes = state!!.getMapBuffer(1)
-      val spanned = TextLayoutManager.getOrCreateSpannableForText(
-        view!!.context, attributedString,
-        this.mReactTextViewManagerCallback
-      )
-    }
-
-    val update = super.getReactTextUpdate(view, props, state)
-    return update
   }
 
   companion object {
