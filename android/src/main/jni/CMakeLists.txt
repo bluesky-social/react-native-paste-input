@@ -8,6 +8,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 file(GLOB react_codegen_SRCS CONFIGURE_DEPENDS *.cpp react/renderer/components/PasteTextInputSpecs/*.cpp)
 
+find_library(log-lib log)
+
 add_library(
   react_codegen_PasteTextInputSpecs
   OBJECT
@@ -39,6 +41,7 @@ target_link_libraries(
   rrc_textinput
   rrc_image
   yoga
+  ${log-lib}
 )
 
 target_compile_options(
