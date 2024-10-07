@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Platform, StyleSheet, View, Button, Text } from 'react-native';
+import { Platform, StyleSheet, View, Button, Text, Pressable } from 'react-native';
 import PasteInput, {
     type PastedFile,
     type PasteInputRef,
@@ -19,7 +19,7 @@ export default function App() {
         console.log('ERROR', error);
         console.log('PASTED FILES', files);
         if (!error) {
-            setFile(files[0]);
+          setFile(files[0]);
         }
     };
 
@@ -58,6 +58,7 @@ export default function App() {
                 title={inputVisible ? 'Hide Input' : 'Show Input'}
                 onPress={toggleInputVisibility}
             />
+          <Pressable />
         </View>
     );
 }

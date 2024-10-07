@@ -341,6 +341,22 @@ class PasteTextInputProps final : public ViewProps {
   std::string fontFamily{};
   std::string textAlignVertical{};
   SharedColor cursorColor{};
+
+
+    /**
+     * Auxiliary information to detect if these props are set or not.
+     * See AndroidTextInputComponentDescriptor for usage.
+     * TODO T63008435: can these, and this feature, be removed entirely?
+     */
+    bool hasPadding{};
+    bool hasPaddingHorizontal{};
+    bool hasPaddingVertical{};
+    bool hasPaddingLeft{};
+    bool hasPaddingTop{};
+    bool hasPaddingRight{};
+    bool hasPaddingBottom{};
+    bool hasPaddingStart{};
+    bool hasPaddingEnd{};
 };
 
 } // namespace facebook::react

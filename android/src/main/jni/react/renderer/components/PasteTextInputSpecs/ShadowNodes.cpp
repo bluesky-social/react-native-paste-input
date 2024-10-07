@@ -152,14 +152,14 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
             state.defaultThemePaddingBottom});
 }
 
-Size AndroidTextInputShadowNode::measureContent(
+Size PasteTextInputShadowNode::measureContent(
         const LayoutContext& layoutContext,
         const LayoutConstraints& layoutConstraints) const {
     if (getStateData().cachedAttributedStringId != 0) {
         return textLayoutManager_
                 ->measureCachedSpannableById(
                         getStateData().cachedAttributedStringId,
-                        getConcreteProps().paragraphAttributes,
+                        ParagraphAttributes{},
                         layoutConstraints)
                 .size;
     }
@@ -180,7 +180,7 @@ Size AndroidTextInputShadowNode::measureContent(
     return textLayoutManager_
             ->measure(
                     AttributedStringBox{attributedString},
-                    getConcreteProps().paragraphAttributes,
+                    ParagraphAttributes{},
                     textLayoutContext,
                     layoutConstraints)
             .size;

@@ -51,6 +51,11 @@ public:
 
     void setTextLayoutManager(SharedTextLayoutManager textLayoutManager);
 
+    Size measureContent(
+            const LayoutContext& layoutContext,
+            const LayoutConstraints& layoutConstraints) const override;
+    void layout(LayoutContext layoutContext) override;
+
 private:
     ContextContainer *contextContainer_;
 
@@ -59,8 +64,6 @@ private:
     void updateStateIfNeeded();
 
     SharedTextLayoutManager textLayoutManager_;
-
-    void layout(LayoutContext layoutContext) override;
 
     mutable std::optional<AttributedString> cachedAttributedString_{};
 };
