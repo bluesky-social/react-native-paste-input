@@ -11,8 +11,28 @@
 #include "Props.h"
 #include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/core/propsConversions.h>
+#include <react/utils/CoreFeatures.h>
 
 namespace facebook::react {
+
+static bool
+hasValue(const RawProps& rawProps, bool defaultValue, const char* name) {
+    auto rawValue = rawProps.at(name, nullptr, nullptr);
+
+    // No change to prop - use default
+    if (rawValue == nullptr) {
+        return defaultValue;
+    }
+
+    // Value passed from JS
+    if (rawValue->hasValue()) {
+        return true;
+    }
+
+    // Null/undefined passed in, indicating that we should use the default
+    // platform value - thereby resetting this
+    return false;
+}
 
 PasteTextInputProps::PasteTextInputProps(
     const PropsParserContext &context,
@@ -81,7 +101,38 @@ PasteTextInputProps::PasteTextInputProps(
     fontWeight(convertRawProp(context, rawProps, "fontWeight", sourceProps.fontWeight, {})),
     fontFamily(convertRawProp(context, rawProps, "fontFamily", sourceProps.fontFamily, {})),
     textAlignVertical(convertRawProp(context, rawProps, "textAlignVertical", sourceProps.textAlignVertical, {})),
-    cursorColor(convertRawProp(context, rawProps, "cursorColor", sourceProps.cursorColor, {}))
+    cursorColor(convertRawProp(context, rawProps, "cursorColor", sourceProps.cursorColor, {})),
+    // See AndroidTextInputComponentDescriptor for usage
+    // TODO T63008435: can these, and this feature, be removed entirely?
+    hasPadding(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPadding : hasValue(rawProps, sourceProps.hasPadding, "padding")),
+    hasPaddingHorizontal(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingHorizontal : hasValue(
+            rawProps,
+            sourceProps.hasPaddingHorizontal,
+    "paddingHorizontal")),
+    hasPaddingVertical(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingVertical : hasValue(
+            rawProps,
+            sourceProps.hasPaddingVertical,
+    "paddingVertical")),
+    hasPaddingLeft(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingLeft : hasValue(
+            rawProps,
+            sourceProps.hasPaddingLeft,
+    "paddingLeft")),
+    hasPaddingTop(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingTop :
+    hasValue(rawProps, sourceProps.hasPaddingTop, "paddingTop")),
+    hasPaddingRight(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingRight : hasValue(
+            rawProps,
+            sourceProps.hasPaddingRight,
+    "paddingRight")),
+    hasPaddingBottom(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingBottom : hasValue(
+            rawProps,
+            sourceProps.hasPaddingBottom,
+    "paddingBottom")),
+    hasPaddingStart(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingStart : hasValue(
+            rawProps,
+            sourceProps.hasPaddingStart,
+    "paddingStart")),
+    hasPaddingEnd(CoreFeatures::enablePropIteratorSetter? sourceProps.hasPaddingEnd :
+    hasValue(rawProps, sourceProps.hasPaddingEnd, "paddingEnd"))
       {}
 
 } // namespace facebook::react

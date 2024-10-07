@@ -46,6 +46,12 @@ android {
       }
     }
   }
+    externalNativeBuild {
+        cmake {
+            path file('../../../../../android/src/main/jni/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
 }
 
 repositories {
