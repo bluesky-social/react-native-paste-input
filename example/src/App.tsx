@@ -51,6 +51,7 @@ export default function App() {
                     smartPunctuation="disable"
                     selectionColor={'blue'}
                 >
+                  <Text style={{color: 'red', fontSize: 30}}>Hello world hello world hello world hello world</Text>
                 </PasteInput>
             )}
             <Button
