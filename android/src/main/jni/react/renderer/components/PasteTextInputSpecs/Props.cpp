@@ -37,7 +37,7 @@ hasValue(const RawProps& rawProps, bool defaultValue, const char* name) {
 PasteTextInputProps::PasteTextInputProps(
     const PropsParserContext &context,
     const PasteTextInputProps &sourceProps,
-    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
+    const RawProps &rawProps): BaseTextInputProps(context, sourceProps, rawProps),
 
     allowFontScaling(convertRawProp(context, rawProps, "allowFontScaling", sourceProps.allowFontScaling, {false})),
     autoCapitalize(convertRawProp(context, rawProps, "autoCapitalize", sourceProps.autoCapitalize, {PasteTextInputAutoCapitalize::None})),

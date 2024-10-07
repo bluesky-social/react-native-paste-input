@@ -9,10 +9,12 @@
  */
 #pragma once
 
+#include <react/renderer/attributedstring/TextAttributes.h>
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/core/propsConversions.h>
 #include <react/renderer/graphics/Color.h>
+#include <react/renderer/components/textinput/BaseTextInputProps.h>
 
 namespace facebook::react {
 
@@ -271,7 +273,7 @@ static inline void fromRawValue(const PropsParserContext& context, const RawValu
 static inline std::string toString(const PasteTextInputTextShadowOffsetStruct &value) {
   return "[Object PasteTextInputTextShadowOffsetStruct]";
 }
-class PasteTextInputProps final : public ViewProps {
+class PasteTextInputProps final : public BaseTextInputProps {
  public:
   PasteTextInputProps() = default;
   PasteTextInputProps(const PropsParserContext& context, const PasteTextInputProps &sourceProps, const RawProps &rawProps);

@@ -51,7 +51,6 @@ export default function App() {
                     smartPunctuation="disable"
                     selectionColor={'blue'}
                 >
-                  <Text style={{color: 'red', fontSize: 30}}>Hello world hello world hello world hello world</Text>
                 </PasteInput>
             )}
             <Button
@@ -82,7 +81,6 @@ const styles = StyleSheet.create({
             android: 2,
         }),
         minHeight: 30,
-        maxHeight: 150,
         borderColor: 'gray',
         borderWidth: 1,
         width: '90%',

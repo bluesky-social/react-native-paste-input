@@ -9,6 +9,7 @@
  */
 
 #include "ShadowNodes.h"
+#include "States.h"
 
 #include <react/renderer/core/LayoutConstraints.h>
 #include <react/renderer/core/LayoutContext.h>
@@ -54,6 +55,7 @@ void PasteTextInputShadowNode::setContextContainer(
 
 AttributedString PasteTextInputShadowNode::getAttributedString() const {
     auto childTextAttributes = TextAttributes::defaultTextAttributes();
+    childTextAttributes.apply(getConcreteProps().textAttributes);
 
     auto attributedString = AttributedString{};
     auto attachments = BaseTextShadowNode::Attachments{};
@@ -83,7 +85,7 @@ AttributedString PasteTextInputShadowNode::getPlaceholderAttributedString() cons
     }
 
     auto textAttributes = TextAttributes::defaultTextAttributes();
-//    textAttributes.apply(getConcreteProps().textAttributes);
+    textAttributes.apply(getConcreteProps().textAttributes);
 
     // If there's no text, it's possible that this Fragment isn't actually
     // appended to the AttributedString (see implementation of appendFragment)
@@ -141,7 +143,7 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
             : getConcreteProps().mostRecentEventCount;
     auto newAttributedString = getMostRecentAttributedString();
 
-    setStateData(AndroidTextInputState{
+    setStateData(PasteTextInputState{
             newEventCount,
             newAttributedString,
             reactTreeAttributedString,
@@ -159,7 +161,7 @@ Size PasteTextInputShadowNode::measureContent(
         return textLayoutManager_
                 ->measureCachedSpannableById(
                         getStateData().cachedAttributedStringId,
-                        ParagraphAttributes{},
+                        getConcreteProps().paragraphAttributes,
                         layoutConstraints)
                 .size;
     }
@@ -180,7 +182,7 @@ Size PasteTextInputShadowNode::measureContent(
     return textLayoutManager_
             ->measure(
                     AttributedStringBox{attributedString},
-                    ParagraphAttributes{},
+                    getConcreteProps().paragraphAttributes,
                     textLayoutContext,
                     layoutConstraints)
             .size;
