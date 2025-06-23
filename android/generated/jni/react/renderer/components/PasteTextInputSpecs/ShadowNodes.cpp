@@ -10,10 +10,6 @@
 
 #include "ShadowNodes.h"
 
-#include <react/renderer/core/LayoutConstraints.h>
-#include <react/renderer/core/LayoutContext.h>
-#include <react/renderer/core/conversions.h>
-
 #include <react/featureflags/ReactNativeFeatureFlags.h>
 #include <react/renderer/attributedstring/AttributedStringBox.h>
 #include <react/renderer/attributedstring/TextAttributes.h>
@@ -22,7 +18,6 @@
 #include <react/renderer/core/LayoutContext.h>
 #include <react/renderer/core/conversions.h>
 #include <react/renderer/textlayoutmanager/TextLayoutContext.h>
-#include <android/log.h>
 
 namespace facebook::react {
 
@@ -34,61 +29,66 @@ void PasteTextInputShadowNode::setTextLayoutManager(
     textLayoutManager_ = std::move(textLayoutManager);
 }
 
-Size PasteTextInputShadowNode::measureContent(
-        const LayoutContext& layoutContext,
-        const LayoutConstraints& layoutConstraints) const {
-    auto textConstraints = getTextConstraints(layoutConstraints);
+    Size PasteTextInputShadowNode::measureContent(
+            const LayoutContext& layoutContext,
+            const LayoutConstraints& layoutConstraints) const {
+        auto textConstraints = getTextConstraints(layoutConstraints);
 
-    if (getStateData().cachedAttributedStringId != 0) {
+        TextLayoutContext textLayoutContext{
+                .pointScaleFactor = layoutContext.pointScaleFactor,
+        };
+
+        if (getStateData().cachedAttributedStringId != 0) {
+            auto textSize = textLayoutManager_
+                    ->measureCachedSpannableById(
+                            getStateData().cachedAttributedStringId,
+                            getConcreteProps().paragraphAttributes,
+                            textLayoutContext,
+                            textConstraints)
+                    .size;
+            return layoutConstraints.clamp(textSize);
+        }
+
+        // Layout is called right after measure.
+        // Measure is marked as `const`, and `layout` is not; so State can be
+        // updated during layout, but not during `measure`. If State is out-of-date
+        // in layout, it's too late: measure will have already operated on old
+        // State. Thus, we use the same value here that we *will* use in layout to
+        // update the state.
+        AttributedString attributedString =
+                getMostRecentAttributedString(layoutContext);
+
+        if (attributedString.isEmpty()) {
+            attributedString = getPlaceholderAttributedString(layoutContext);
+        }
+
+        if (attributedString.isEmpty() && getStateData().mostRecentEventCount != 0) {
+            return {.width = 0, .height = 0};
+        }
+
         auto textSize = textLayoutManager_
-                ->measureCachedSpannableById(
-                        getStateData().cachedAttributedStringId,
+                ->measure(
+                        AttributedStringBox{attributedString},
                         getConcreteProps().paragraphAttributes,
+                        textLayoutContext,
                         textConstraints)
                 .size;
         return layoutConstraints.clamp(textSize);
     }
 
-    // Layout is called right after measure.
-    // Measure is marked as `const`, and `layout` is not; so State can be
-    // updated during layout, but not during `measure`. If State is out-of-date
-    // in layout, it's too late: measure will have already operated on old
-    // State. Thus, we use the same value here that we *will* use in layout to
-    // update the state.
-    AttributedString attributedString = getMostRecentAttributedString();
-
-    if (attributedString.isEmpty()) {
-        attributedString = getPlaceholderAttributedString();
-    }
-
-    if (attributedString.isEmpty() && getStateData().mostRecentEventCount != 0) {
-        return {.width = 0, .height = 0};
-    }
-
-    TextLayoutContext textLayoutContext;
-    textLayoutContext.pointScaleFactor = layoutContext.pointScaleFactor;
-    auto textSize = textLayoutManager_
-            ->measure(
-                    AttributedStringBox{attributedString},
-                    getConcreteProps().paragraphAttributes,
-                    textLayoutContext,
-                    textConstraints)
-            .size;
-    return layoutConstraints.clamp(textSize);
-}
-
 void PasteTextInputShadowNode::layout(LayoutContext layoutContext) {
-    updateStateIfNeeded();
+    updateStateIfNeeded(layoutContext);
     ConcreteViewShadowNode::layout(layoutContext);
 }
 
 Float PasteTextInputShadowNode::baseline(
-        const LayoutContext& /*layoutContext*/,
+        const LayoutContext& layoutContext,
         Size size) const {
-    AttributedString attributedString = getMostRecentAttributedString();
+    AttributedString attributedString =
+            getMostRecentAttributedString(layoutContext);
 
     if (attributedString.isEmpty()) {
-        attributedString = getPlaceholderAttributedString();
+        attributedString = getPlaceholderAttributedString(layoutContext);
     }
 
     // Yoga expects a baseline relative to the Node's border-box edge instead of
@@ -98,10 +98,10 @@ Float PasteTextInputShadowNode::baseline(
                YGNodeLayoutGetPadding(&yogaNode_, YGEdgeTop);
 
     AttributedStringBox attributedStringBox{attributedString};
-    return textLayoutManager_->baseline(
+    return LineMeasurement::baseline(textLayoutManager_->measureLines(
             attributedStringBox,
             getConcreteProps().paragraphAttributes,
-            size) +
+            size)) +
            top;
 }
 
@@ -126,10 +126,12 @@ LayoutConstraints PasteTextInputShadowNode::getTextConstraints(
     }
 }
 
-void PasteTextInputShadowNode::updateStateIfNeeded() {
+
+void PasteTextInputShadowNode::updateStateIfNeeded(
+        const LayoutContext& layoutContext) {
     ensureUnsealed();
     const auto& stateData = getStateData();
-    auto reactTreeAttributedString = getAttributedString();
+    auto reactTreeAttributedString = getAttributedString(layoutContext);
 
     // Tree is often out of sync with the value of the TextInput.
     // This is by design - don't change the value of the TextInput in the State,
@@ -153,7 +155,7 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
             reactTreeAttributedString)
                          ? 0
                          : props.mostRecentEventCount;
-    auto newAttributedString = getMostRecentAttributedString();
+    auto newAttributedString = getMostRecentAttributedString(layoutContext);
 
     setStateData(TextInputState{
             AttributedStringBox(newAttributedString),
@@ -162,9 +164,10 @@ void PasteTextInputShadowNode::updateStateIfNeeded() {
             newEventCount});
 }
 
-AttributedString PasteTextInputShadowNode::getAttributedString() const {
+AttributedString PasteTextInputShadowNode::getAttributedString(const LayoutContext& layoutContext) const {
     // Use BaseTextShadowNode to get attributed string from children
     auto childTextAttributes = TextAttributes::defaultTextAttributes();
+    childTextAttributes.fontSizeMultiplier = layoutContext.fontSizeMultiplier;
     childTextAttributes.apply(getConcreteProps().textAttributes);
     // Don't propagate the background color of the TextInput onto the attributed
     // string. Android tries to render shadow of the background alongside the
@@ -173,19 +176,16 @@ AttributedString PasteTextInputShadowNode::getAttributedString() const {
 
     auto attributedString = AttributedString{};
     auto attachments = BaseTextShadowNode::Attachments{};
-
     BaseTextShadowNode::buildAttributedString(
             childTextAttributes, *this, attributedString, attachments);
     attributedString.setBaseTextAttributes(childTextAttributes);
-
-    auto txt = attributedString.getString();
-
 
     // BaseTextShadowNode only gets children. We must detect and prepend text
     // value attributes manually.
     if (!getConcreteProps().text.empty()) {
         auto textAttributes = TextAttributes::defaultTextAttributes();
         textAttributes.apply(getConcreteProps().textAttributes);
+        textAttributes.fontSizeMultiplier = layoutContext.fontSizeMultiplier;
         auto fragment = AttributedString::Fragment{};
         fragment.string = getConcreteProps().text;
         fragment.textAttributes = textAttributes;
@@ -200,11 +200,11 @@ AttributedString PasteTextInputShadowNode::getAttributedString() const {
     return attributedString;
 }
 
-AttributedString PasteTextInputShadowNode::getMostRecentAttributedString()
-const {
+AttributedString PasteTextInputShadowNode::getMostRecentAttributedString(
+        const LayoutContext& layoutContext) const {
     const auto& state = getStateData();
 
-    auto reactTreeAttributedString = getAttributedString();
+    auto reactTreeAttributedString = getAttributedString(layoutContext);
 
     // Sometimes the treeAttributedString will only differ from the state
     // not by inherent properties (string or prop attributes), but by the frame of
@@ -225,22 +225,23 @@ const {
 // display at all.
 // TODO T67606511: We will redefine the measurement of empty strings as part
 // of T67606511
-AttributedString PasteTextInputShadowNode::getPlaceholderAttributedString()
-const {
-    const auto& props = BaseShadowNode::getConcreteProps();
+    AttributedString PasteTextInputShadowNode::getPlaceholderAttributedString(
+            const LayoutContext& layoutContext) const {
+        const auto& props = BaseShadowNode::getConcreteProps();
 
-    AttributedString attributedString;
-    auto placeholderString = !props.placeholder.empty()
-                             ? props.placeholder
-                             : BaseTextShadowNode::getEmptyPlaceholder();
-    auto textAttributes = TextAttributes::defaultTextAttributes();
-    textAttributes.apply(props.textAttributes);
-    attributedString.appendFragment(
-            {.string = std::move(placeholderString),
-                    .textAttributes = textAttributes,
-                    .parentShadowView = ShadowView(*this)});
-    return attributedString;
-}
+        AttributedString attributedString;
+        auto placeholderString = !props.placeholder.empty()
+                                 ? props.placeholder
+                                 : BaseTextShadowNode::getEmptyPlaceholder();
+        auto textAttributes = TextAttributes::defaultTextAttributes();
+        textAttributes.fontSizeMultiplier = layoutContext.fontSizeMultiplier;
+        textAttributes.apply(props.textAttributes);
+        attributedString.appendFragment(
+                {.string = std::move(placeholderString),
+                        .textAttributes = textAttributes,
+                        .parentShadowView = ShadowView(*this)});
+        return attributedString;
+    }
 
 
 } // namespace facebook::react

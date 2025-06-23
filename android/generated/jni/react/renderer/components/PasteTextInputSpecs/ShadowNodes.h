@@ -14,10 +14,11 @@
 #include "Props.h"
 #include "States.h"
 #include <jsi/jsi.h>
+
 #include <react/renderer/attributedstring/AttributedString.h>
-#include <react/renderer/textlayoutmanager/TextLayoutManager.h>
-#include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/textinput/TextInputState.h>
+#include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <react/utils/ContextContainer.h>
 
 
 namespace facebook::react {
@@ -31,8 +32,7 @@ class PasteTextInputShadowNode final : public ConcreteViewShadowNode<
     PasteTextInputComponentName,
     PasteTextInputProps,
     PasteTextInputEventEmitter,
-    TextInputState,
-    true> {
+    TextInputState> {
 public:
     using ConcreteViewShadowNode::ConcreteViewShadowNode;
 
@@ -74,19 +74,22 @@ private:
      * Creates a `State` object (with `AttributedText` and
      * `TextLayoutManager`) if needed.
      */
-    void updateStateIfNeeded();
+    void updateStateIfNeeded(const LayoutContext& layoutContext);
 
     /*
      * Returns a `AttributedString` which represents text content of the node.
      */
-    AttributedString getAttributedString() const;
+    AttributedString getAttributedString(
+            const LayoutContext& layoutContext) const;
 
     /**
      * Get the most up-to-date attributed string for measurement and State.
      */
-    AttributedString getMostRecentAttributedString() const;
+    AttributedString getMostRecentAttributedString(
+            const LayoutContext& layoutContext) const;
 
-    AttributedString getPlaceholderAttributedString() const;
+    AttributedString getPlaceholderAttributedString(
+            const LayoutContext& layoutContext) const;
 };
 
 } // namespace facebook::react

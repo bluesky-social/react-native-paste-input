@@ -54,7 +54,9 @@ class PasteTextInputManager(context: ReactApplicationContext) : ReactTextInputMa
   }
 
   override fun getExportedCustomBubblingEventTypeConstants(): MutableMap<String, Any> {
-    val map = super.getExportedCustomBubblingEventTypeConstants()!!
+    val map = super.getExportedCustomBubblingEventTypeConstants()?.toMutableMap()
+      ?: return mutableMapOf()
+
     map["onPaste"] = MapBuilder.of(
       "phasedRegistrationNames",
       MapBuilder.of("bubbled", "onPaste")

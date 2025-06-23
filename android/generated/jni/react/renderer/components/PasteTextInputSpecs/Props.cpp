@@ -20,7 +20,7 @@ namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 SharedDebugStringConvertibleList PasteTextInputProps::getDebugProps() const {
-    return PasteTextInputProps::getDebugProps();
+    return {};
 }
 #endif
 
@@ -359,15 +359,6 @@ folly::dynamic PasteTextInputProps::getDynamic() const {
     props["hasPaddingBottom"] = hasPaddingBottom;
 
     return props;
-}
-
-static folly::dynamic toDynamic(
-        const std::vector<std::string>& acceptDragAndDropTypes) {
-    folly::dynamic acceptDragAndDropTypesArray = folly::dynamic::array();
-    for (const auto& acceptDragAndDropType : acceptDragAndDropTypes) {
-        acceptDragAndDropTypesArray.push_back(acceptDragAndDropType);
-    }
-    return acceptDragAndDropTypesArray;
 }
 
 ComponentName PasteTextInputProps::getDiffPropsImplementationTarget() const {
