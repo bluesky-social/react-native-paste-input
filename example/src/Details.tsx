@@ -1,13 +1,12 @@
 import React from 'react';
-import { Image, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import type { PastedFile } from '@mattermost/react-native-paste-input';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface DetailsProps {
     file?: PastedFile;
 }
 
-const getStyle = (isDarkMode: boolean) => {
+const getStyle = () => {
     return StyleSheet.create({
         container: {
             justifyContent: 'center',
@@ -28,14 +27,12 @@ const getStyle = (isDarkMode: boolean) => {
             flexDirection: 'row',
         },
         label: {
-            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: 16,
             lineHeight: 18,
             fontWeight: '700',
             marginRight: 5,
         },
         text: {
-            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: 14,
             lineHeight: 16,
             flexWrap: 'wrap',
@@ -45,13 +42,11 @@ const getStyle = (isDarkMode: boolean) => {
 };
 
 const Details = ({ file }: DetailsProps) => {
-    const isDarkMode = useColorScheme() === 'dark';
-
     if (!file) {
         return null;
     }
 
-    const styles = getStyle(isDarkMode);
+    const styles = getStyle();
     const isImage = file.type.includes('image');
     let imageElement;
     if (isImage) {
